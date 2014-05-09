@@ -1,0 +1,14 @@
+<library path="lib/libjsk_pcl_ros">
+  <class name="aginika_pcl/ConcaveHull" type="ConcaveHull"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      jsk_pcl_ros::ConcaveHull
+    </description>
+  </class>
+  <class name="aginika_pcl/SimpleMutableModelTracking" type="SimpleMutableModelTracking"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      call service for update tracking model.
+    </description>
+  </class>
+</library>
