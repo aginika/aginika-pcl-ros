@@ -689,7 +689,7 @@ public:
   }
 
   //These are from rviz user interactive callback
-  void register_new_cloud_cb(const aginika_rviz_plugins::PointCloud2WithId& cloud_msg)
+  void register_new_cloud_cb(const aginika_pcl_ros::PointCloud2WithId& cloud_msg)
   {
     //    ROS_INFO("cloud_cb id : %d tracker_num : %d tracker_name : %s tracker_sercice_name : %s", cloud_msg.id, tracker_num_, tracker_name_.c_str(), tracker_service_name_.c_str());
     pcl::PointCloud<pcl::PointXYZRGBA>::Ptr target_object_cloud_raw(new pcl::PointCloud<pcl::PointXYZRGBA>());
