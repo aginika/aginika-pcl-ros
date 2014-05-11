@@ -1,0 +1,6 @@
+sensor_msgs/PointCloud2 reference_cloud
+sensor_msgs/PointCloud2 target_cloud
+---
+sensor_msgs/PointCloud2 result_cloud
+float32[] matrix
+geometry_msgs/Point center

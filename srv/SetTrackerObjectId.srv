@@ -1,0 +1,6 @@
+int8 tracker_id
+string new_object_id
+sensor_msgs/PointCloud2 cloud
+int8 object_property
+---
+int8 id
