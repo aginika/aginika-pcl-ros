@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   aginika_ros_debug_tools
 )
 
-add_message_files(FILES IndicesArray.msg PointsArray.msg ClusterPointIndices.msg Int32Stamped.msg TrackerInfo.msg TrackerInfoArray.msg)
+add_message_files(FILES IndicesArray.msg PointsArray.msg ClusterPointIndices.msg Int32Stamped.msg TrackerInfo.msg TrackerInfoArray.msg PointCloud2WithId.msg)
 add_service_files(FILES SetPointCloud2.srv SetWorkingState.srv SetFrameId.srv SetFilterMode.srv ICPAlign.srv SetTrackerObjectId.srv ICPAlignReturn.srv SetMultiPointCloud2.srv SetWorkingStateAndTopic.srv SetMainObjectId.srv PointToContour.srv)
 generate_messages(DEPENDENCIES pcl_msgs sensor_msgs)
 
