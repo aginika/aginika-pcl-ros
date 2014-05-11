@@ -13,10 +13,10 @@
 #include "aginika_pcl_ros/SetTrackerObjectId.h"
 #include "aginika_pcl_ros/SetMainObjectId.h"
 #include "aginika_pcl_ros/TrackerInfoArray.h"
+#include <aginika_pcl_ros/PointCloud2WithId.h>
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <aginika_rviz_plugins/PointCloud2WithId.h>
 
 #include <boost/smart_ptr/make_shared.hpp>
 #include <boost/format.hpp>
@@ -43,7 +43,7 @@
 #include <time.h>
 #include <pcl_ros/transforms.h>
 
-#include <aginika_debug_tools/aginika_debug_tools.h>
+#include <aginika_ros_debug_tools/aginika_ros_debug_tools.h>
 using namespace std;
 
 class TrackingObjectInfo{

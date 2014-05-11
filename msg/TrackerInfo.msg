@@ -1,0 +1,2 @@
+int8 tracker_id
+string object_id
