@@ -1,5 +1,5 @@
-#ifndef __FPFH_PCDFEATURE__
-#define __FPFH_PCDFEATURE__
+#ifndef __FPFH_Average_PCDFEATURE__
+#define __FPFH_Average_PCDFEATURE__
 
 #include <aginika_pcl_ros/PCDFeatureProcedure.h>
 #include <pcl/features/fpfh_omp.h>
@@ -19,9 +19,9 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 
-class FPFH_PCDFeature : public PCDFeature{
+class FPFH_Average_PCDFeature : public PCDFeature{
 public:
-  FPFH_PCDFeature();
+  FPFH_Average_PCDFeature();
 
   virtual void calculate(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr input_normals);
 

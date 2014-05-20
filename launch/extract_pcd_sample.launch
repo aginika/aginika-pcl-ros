@@ -9,13 +9,17 @@
 
   <node pkg="aginika_ros_debug_tools" name="topic_pulse_drive" type="topic_pulse_drive" args="/pcl_nodelet/normal_concat/output" />
 
-  <node pkg="nodelet" type="nodelet" name="$(arg manager)"
-        args="manager" output="screen"/>
+  <!-- <node pkg="nodelet" type="nodelet" name="$(arg manager)" -->
+  <!--       args="manager" output="screen"/> -->
 
-  <node pkg="nodelet" type="nodelet" name="pcd_writer"
-        args="load pcl/PCDWriter $(arg manager)"
-        clear_params="true">
-    <remap from="~input" to="/pcl_nodelet/normal_concat/output_pulse_out"/>
+  <!-- <node pkg="nodelet" type="nodelet" name="pcd_writer" -->
+  <!--       args="load pcl/PCDWriter $(arg manager)" -->
+  <!--       clear_params="true"> -->
+  <!--   <remap from="~input" to="/pcl_nodelet/normal_concat/output_pulse_out"/> -->
+  <!-- </node> -->
+
+  <node pkg="aginika_pcl_ros" name="pointcloud_saver" type="selected_pointcloud_saver">
+    <remap from="input" to="/pcl_nodelet/normal_concat/output_pulse_out"/>
   </node>
 
   <node pkg="rviz" type="rviz" name="rviz" args=" -d $(find aginika_pcl_ros)/launch/rviz/extract_pcd_sample.rviz"/>

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(aginika_pcl_ros)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   pcl_conversions
@@ -35,6 +37,9 @@ add_library(aginika_pcl_ros
   SHARED
   src/PCDFeatureProcedure.cpp
   src/FPFH_PCDFeature.cpp
+  src/FPFH_Average_PCDFeature.cpp
+  src/AllPassFilter.cpp
+  src/RandomRegionFilter.cpp
 )
 target_link_libraries(aginika_pcl_ros ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES})
 add_dependencies(aginika_pcl_ros ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
