@@ -23,12 +23,22 @@ catkin_package(
   DEPENDS pcl
   CATKIN-DEPENDS pcl_ros message_runtime pcl_msgs jsk_rviz_plugins aginika_ros_debug_tools sensor_msgs
   INCLUDE_DIRS include
-  LIBRARIES jsk_pcl_ros
+  LIBRARIES aginika_pcl_ros
 )
 
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
+
+add_library(aginika_pcl_ros
+  SHARED
+  src/PCDFeatureProcedure.cpp
+  src/FPFH_PCDFeature.cpp
+)
+target_link_libraries(aginika_pcl_ros ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES})
+add_dependencies(aginika_pcl_ros ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
+
 
 add_executable(simple_mutable_model_tracking src/simple_mutable_model_tracking_not_nodelet.cpp)
 target_link_libraries(simple_mutable_model_tracking ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES})
@@ -55,10 +65,15 @@ target_link_libraries(selected_pointcloud_saver ${catkin_LIBRARIES} ${pcl_ros_LI
 add_dependencies(selected_pointcloud_saver ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
 
 
+add_executable(pcd_feature_sample sample/pcd_feature_sample.cpp)
+target_link_libraries(pcd_feature_sample ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES} aginika_pcl_ros)
+add_dependencies(pcd_feature_sample ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
+
+
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
-install(TARGETS simple_mutable_model_tracking multi_tracking_upgrade_manager selected_pointcloud_saver generalized_icp_server
+install(TARGETS simple_mutable_model_tracking multi_tracking_upgrade_manager selected_pointcloud_saver generalized_icp_server pcd_feature_sample
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})

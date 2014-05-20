@@ -3,7 +3,7 @@
     <arg name="depth_registration" value="true"/>
   </include>
 
-  <node pkg="topic_tools" type="throttle" name="depth_points_reduction" args=" messages /camera/depth_registered/points 1.0"/>
+  <node pkg="topic_tools" type="throttle" name="depth_points_reduction" args=" messages /camera/depth_registered/points 3.0"/>
 
   <arg name="manager" default="pcl_nodelet_manager" />
   <arg name="input_point" default="/camera/depth_registered/points_throttle"/>
@@ -58,5 +58,7 @@
     <!--   <remap from="~input" to="normal_concat/output"/> -->
     <!-- </node> -->
   </group>
+
+  <node pkg="rosbag" type="record" name="rosbag_record" args=" /tf /pcl_nodelet/normal_concat/output -o $(env HOME)/bagfiles/ "/>
 
 </launch>
