@@ -54,7 +54,7 @@ class RandomForestLearner:
         clf = RandomForestClassifier(n_estimators=250, max_features=7, max_depth=29, min_split=1, random_state=0)
         clf.fit(self.data_x_con, self.data_y_con)
         from sklearn.externals import joblib
-        joblib.dump(clf, "/tmp/")
+        joblib.dump(clf, "/tmp/random_forest.pkl")
 
 
 if __name__ == "__main__":
