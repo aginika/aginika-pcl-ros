@@ -52,7 +52,7 @@ class RandomForestLearner:
 
     def save_clf(self):
         clf = RandomForestClassifier(n_estimators=250, max_features=7, max_depth=29, min_split=1, random_state=0)
-        clf.fit(data_x, data_y)
+        clf.fit(self.data_x_con, self.data_y_con)
         from sklearn.externals import joblib
         joblib.dump(clf, "/tmp/")
 
@@ -75,9 +75,10 @@ if __name__ == "__main__":
     classifier = RandomForestLearner()
     rospy.loginfo("Random Forest Setup Both Class")
     classifier.setupBothClass(argvs[1], argvs[2])
-    rospy.loginfo("Random Forest Calculate Start")
-    classifier.calculate()
-    rospy.loginfo("Random Forest Calculate end")
+    rospy.loginfo("Random Forest Save Start")
+    classifier.save_clf()
+    rospy.loginfo("Random Forest Save end")
+
 
 # from os import listdir
 # from os.path import isfile, join
