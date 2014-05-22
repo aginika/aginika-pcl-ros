@@ -13,12 +13,13 @@ void DOT_PCDFeature::calculate(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr inpu
   search_octree.addPointsFromInputCloud ();
 
   srand(time(NULL));
-  int target_id = rand() % input_normals->points.size() ;
-  std::vector< int > k_indices;
-  std::vector< float > k_sqr_distances;
 
   std::vector< float > dot_array;
   for(int i = 0; i < normal_nums_; i ++){
+    int target_id = rand() % input_normals->points.size() ;
+    std::vector< int > k_indices;
+    std::vector< float > k_sqr_distances;
+
     search_octree.nearestKSearch (target_id, 1, k_indices, k_sqr_distances);
     pcl::PointXYZRGBNormal point1 = input_normals->points[target_id];
     pcl::PointXYZRGBNormal point2 = input_normals->points[target_id];
