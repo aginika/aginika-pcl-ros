@@ -5,6 +5,7 @@
 #include <aginika_pcl_ros/SHOT_PCDFeature.h>
 #include <aginika_pcl_ros/AllPassFilter.h>
 #include <aginika_pcl_ros/RandomRegionFilter.h>
+#include <aginika_pcl_ros/RandomSquareFilter.h>
 #include <ros/ros.h>
 #include <sstream>
 #include <dirent.h>
@@ -23,6 +24,7 @@ int main(int argc, char* argv[]){
     ROS_ERROR("%s method_filter method_feature target_directory", argv[0]);
     ROS_ERROR("filter  0:AllPass");
     ROS_ERROR("        1:RandomRegion");
+    ROS_ERROR("        2:RandomSquare");
     ROS_ERROR("feature 0:FPFH (random chose)");
     ROS_ERROR("        1:FPFH_Average");
     ROS_ERROR("        2:Dot");
@@ -52,6 +54,11 @@ int main(int argc, char* argv[]){
       filter = new RandomRegionFilter();
     }
     break;
+  case 2:
+    {
+      filter = new RandomRegionFilter();
+    }
+    break;
   default:
     {
       ROS_ERROR("Filter method %d is invalid", method_filter);
@@ -69,10 +76,12 @@ int main(int argc, char* argv[]){
     {
       feature = new FPFH_Average_PCDFeature();
     }
+    break;
   case 2:
     {
       feature = new DOT_PCDFeature();
     }
+    break;
   case 3:
     {
       feature = new SHOT_PCDFeature();
