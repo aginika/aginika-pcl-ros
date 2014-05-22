@@ -11,34 +11,21 @@
   <group ns="pcl_nodelet">
     <node pkg="nodelet" type="nodelet" name="$(arg manager)"
           args="manager" output="screen"/>
-
-    <node pkg="nodelet" type="nodelet" name="ground_segmentation" args="load pcl/SACSegmentation $(arg manager)"
-          output="screen"
-          clear_params="true"
-          respawn="false">
+     <node pkg="nodelet" type="nodelet"
+          name="passthrough_z"
+          args="load pcl/PassThrough $(arg manager)"
+          output="screen" clear_params="true">
       <remap from="~input" to="$(arg input_point)" />
       <rosparam>
-        model_type: 9
-        distance_threshold: 0.01
-        max_iterations: 10000
-        method_type: 0
-        optimize_coefficients: true
-        max_queue_size: 20
-        min_inliers: 100
-      </rosparam>
-    </node>
-    <node pkg="nodelet" type="nodelet" name="extract_nonground_indices" args="load pcl/ExtractIndices $(arg manager)" output="screen" respawn="true">
-      <remap from="~input"   to="$(arg input_point)" />
-      <remap from="~indices" to="ground_segmentation/inliers" />
-      <rosparam>
-        negative: true
-        max_queue_size: 5000
+        filter_field_name: z
+        filter_limit_min: 0.0
+        filter_limit_max: 2.0
       </rosparam>
     </node>
     <node pkg="nodelet" type="nodelet" name="normal_estimate"
           args="load pcl/NormalEstimationOMP $(arg manager)"
           clear_params="true">
-      <remap from="~input" to="extract_nonground_indices/output" />
+      <remap from="~input" to="passthrough_z/output" />
       <rosparam>
         radius_search: 0.02
         k_search: 0
@@ -49,7 +36,7 @@
     <node pkg="nodelet" type="nodelet" name="normal_concat"
           args="load jsk_pcl/NormalConcatenater $(arg manager)"
           clear_params="true">
-      <remap from="~input" to="extract_nonground_indices/output"/>
+      <remap from="~input" to="passthrough_z/output"/>
       <remap from="~normal" to="normal_estimate/output"/>
     </node>
     <!-- <node pkg="nodelet" type="nodelet" name="pcd_writer" -->

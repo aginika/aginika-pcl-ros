@@ -1,7 +1,7 @@
 #include <aginika_pcl_ros/FPFH_Average_PCDFeature.h>
 
 FPFH_Average_PCDFeature::FPFH_Average_PCDFeature():radius_search_(0.03){
-  feature_name_ = "FPFH";
+  feature_name_ = "FPFH_Average";
 };
 
 void FPFH_Average_PCDFeature::calculate(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr input_normals){

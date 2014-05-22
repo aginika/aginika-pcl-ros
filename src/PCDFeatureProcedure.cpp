@@ -2,6 +2,11 @@
 
 PCDFeatureProcedure::PCDFeatureProcedure(){
   normals_.reset(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+  normals_for_feature_.reset(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+  pnh_ = new ros::NodeHandle("~");
+  pub_ = pnh_->advertise<sensor_msgs::PointCloud2>("debug", 1);
+
+  repeat_time_ = 30;
 }
 
 void PCDFeatureProcedure::registerPCDFile(std::string filename){
@@ -26,13 +31,10 @@ void PCDFeatureProcedure::calculate(){
     ROS_INFO("complete %d / %ld", i, filenames_.size());
     i++;
     //open pcd file.
-    ROS_INFO("Open File");
     openPCDFile(filename);
 
     //calculate features
-    ROS_INFO("Calcurate Featues");
     calculateFeatures();
-    ROS_INFO("PointCloud nums %ld", normals_->points.size());
 
     //get features and write out to file
     ROS_INFO("Write out");
@@ -40,12 +42,69 @@ void PCDFeatureProcedure::calculate(){
   }
 };
 
-void PCDFeatureProcedure::calculateFeatures(){
-  //filter the target normals
-  target_filter_->filter(normals_);
+int PCDFeatureProcedure::clustering(){
+  pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGBNormal>);
+  std::vector<pcl::PointIndices> cluster_indices;
 
-  //calculate the features
-  target_feature_->calculate(normals_);
+  pcl::EuclideanClusterExtraction<pcl::PointXYZRGBNormal> ec;
+  ec.setClusterTolerance (0.02);
+  ec.setMinClusterSize (50);
+  ec.setMaxClusterSize (100000);
+  ec.setSearchMethod (tree);
+
+  ec.setInputCloud (normals_);
+  ec.extract (cluster_indices);
+
+  int id = 0;
+  int largest_num = 0;
+  //get the largest
+  for (int i = 0; i < cluster_indices.size(); i++){
+    if(largest_num < cluster_indices[i].indices.size()){
+      id = i;
+      largest_num = cluster_indices[i].indices.size();
+    }
+  }
+
+  if(cluster_indices.size() == 0)
+    return 0;
+
+  //extract the target
+  pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr tmp_normals(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+  pcl::PointIndices::Ptr inliers (new pcl::PointIndices(cluster_indices[id]));
+  pcl::ExtractIndices<pcl::PointXYZRGBNormal> extract;
+  extract.setInputCloud (normals_);
+  extract.setIndices (inliers);
+  extract.filter (*tmp_normals);
+
+  tmp_normals.swap(normals_);
+
+  sensor_msgs::PointCloud2 debug_pc2;
+  pcl::toROSMsg(*normals_, debug_pc2);
+  debug_pc2.header.frame_id="base2";
+  debug_pc2.header.stamp = ros::Time::now();
+
+  pub_.publish(debug_pc2);
+  return 1;
+}
+
+void PCDFeatureProcedure::calculateFeatures(){
+  //Clustering and get Most Large.
+  ROS_INFO("clustering before %ld ", normals_->points.size());
+  int result = clustering();
+
+  if ( result == 0 )
+    return;
+  //repeat as the time
+  for (int i = 0; i < repeat_time_; i++){
+    //filter the target normals
+    ROS_INFO("filter before %ld ", normals_->points.size());
+    normals_for_feature_.reset(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
+    target_filter_->filter(normals_, normals_for_feature_);
+
+    //calculate the features
+    ROS_INFO("feature before %ld ", normals_for_feature_->points.size());
+    target_feature_->calculate(normals_for_feature_);
+  }
 }
 
 void PCDFeatureProcedure::writeOutFeatures(std::string filename){

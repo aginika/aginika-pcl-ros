@@ -4,6 +4,6 @@ AllPassFilter::AllPassFilter(){
   filter_name_ = "all_pass";
 }
 
-void AllPassFilter::filter(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr& input_normals){
+void AllPassFilter::filter(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr& input_normals, pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr& output_normals){
   ROS_INFO("All Pass filter");
 }

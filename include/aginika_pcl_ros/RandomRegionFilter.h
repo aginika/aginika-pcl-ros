@@ -21,7 +21,7 @@
 class RandomRegionFilter : public PCDPrevFilter{
 public:
   RandomRegionFilter();
-  virtual void filter(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr& input_normals);
+  virtual void filter(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr& input_normals, pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr& output_normals);
   std::string pass_through( double pass_offset, pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_normals, pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr &cloud_normals_pass);
 
 

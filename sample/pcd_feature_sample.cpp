@@ -5,16 +5,24 @@
 #include <aginika_pcl_ros/RandomRegionFilter.h>
 #include <ros/ros.h>
 #include <sstream>
+#include <dirent.h>
+#include <errno.h>
+#include <vector>
+#include <string>
+#include <iostream>
+
+using namespace std;
+
 int main(int argc, char* argv[]){
   ros::init(argc, argv,"test_pcd_feature");
 
-  if (argc < 3){
+  if (argc < 4){
     ROS_ERROR("Too few aruguments");
-    ROS_ERROR("%s method_filter method_feature", argv[0]);
+    ROS_ERROR("%s method_filter method_feature target_directory", argv[0]);
     ROS_ERROR("filter  0:AllPass");
     ROS_ERROR("        1:RandomRegion");
     ROS_ERROR("feature 0:FPFH (random chose)");
-    ROS_ERROR("         :FPFH_Average");
+    ROS_ERROR("        1:FPFH_Average");
     exit(-1);
   }
 
@@ -67,17 +75,38 @@ int main(int argc, char* argv[]){
 
   ros::NodeHandle n;
   PCDFeatureProcedure* pcd_fp = new PCDFeatureProcedure();
-  // FPFH_PCDFeature* fpfh_pcd_feature = new FPFH_PCDFeature();
-  // AllPassFilter* all_pass_filter = new AllPassFilter();
-  // RandomRegionFilter* random_region_filter = new RandomRegionFilter();
 
   pcd_fp->setFilter(filter);
   pcd_fp->setFeature(feature);
-  // pcd_fp->setFeature(fpfh_pcdfeature);
-  // //  pcd_fp->setFilter(all_pass_filter);
-  // pcd_fp->setFilter(random_region_filter);
-  pcd_fp->registerPCDFile(std::string("/home/inagaki/.ros/1400580405.pcd"));
+  pcd_fp->setRepeatTime(30);
 
-  ROS_INFO("Here");
+
+  int from_index;
+  std::stringstream ss3;
+  ss3 << argv[3];
+  ss3 >> from_index;
+  ROS_INFO("Start Index from %d", from_index);
+
+  //Registe files from path
+  int counter = 0;
+  for (int i = 4; i < argc ; i++){
+    DIR *dp;
+    struct dirent *dirp;
+    if((dp  = opendir(argv[i])) == NULL) {
+      cout << "Error(" << errno << ") opening " << argv[i] <<  endl;
+      return errno;
+    }
+
+    while ((dirp = readdir(dp)) != NULL) {
+      std::string file_name = std::string(dirp->d_name);
+      if(file_name.find(".pcd", 0) != string::npos && counter >= from_index){
+        //        ROS_INFO("Target : %s registered", (std::string(argv[i]) + file_name).c_str());
+        pcd_fp->registerPCDFile(std::string(argv[i]) + file_name);
+      }
+      counter++;
+    }
+    closedir(dp);
+  }
+
   pcd_fp->calculate();
 }

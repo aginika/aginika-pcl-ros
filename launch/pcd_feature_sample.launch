@@ -1,3 +1,12 @@
 <launch>
-  <node pkg="aginika_pcl_ros" name="pcd_feature_sample" type="pcd_feature_sample" args=" 1 1 " output="screen" clear_params="true"/>
+  <!-- <node pkg="aginika_pcl_ros" name="pcd_feature_sample" type="pcd_feature_sample" -->
+  <!--       args=" 1 1 0 $(env HOME)/pcd/non_clothes/non_clothes_1/ $(env HOME)/pcd/non_clothes/non_clothes_2/ $(env HOME)/pcd/non_clothes/non_clothes_3/ $(env HOME)/pcd/non_clothes/non_clothes_4/" output="screen" clear_params="true"/> -->
+
+
+  <!-- <node pkg="aginika_pcl_ros" name="pcd_feature_sample" type="pcd_feature_sample" -->
+  <!--       args=" 1 1 511 $(env HOME)/pcd/clothes/clothes_1/ $(env HOME)/pcd/clothes/clothes_2/ $(env HOME)/pcd/clothes/clothes_3/ $(env HOME)/pcd/clothes/clothes_4/ $(env HOME)/pcd/clothes/clothes_5/" output="screen" clear_params="true"/> -->
+
+  <node pkg="aginika_pcl_ros" name="pcd_feature_sample" type="pcd_feature_sample"
+        args=" 1 0 0 $(env HOME)/pcd/clothes/clothes_1/ $(env HOME)/pcd/clothes/clothes_2/ $(env HOME)/pcd/clothes/clothes_3/ $(env HOME)/pcd/clothes/clothes_4/ $(env HOME)/pcd/clothes/clothes_5/" output="screen" clear_params="true"/>
+
 </launch>
