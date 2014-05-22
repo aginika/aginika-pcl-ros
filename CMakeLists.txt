@@ -38,6 +38,7 @@ add_library(aginika_pcl_ros
   src/PCDFeatureProcedure.cpp
   src/FPFH_PCDFeature.cpp
   src/FPFH_Average_PCDFeature.cpp
+  src/SHOT_PCDFeature.cpp
   src/AllPassFilter.cpp
   src/RandomRegionFilter.cpp
   src/Dot_PCDFeature.cpp
