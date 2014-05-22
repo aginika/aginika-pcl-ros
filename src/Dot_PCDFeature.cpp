@@ -5,6 +5,8 @@ DOT_PCDFeature::DOT_PCDFeature(){
 };
 
 void DOT_PCDFeature::calculate(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr input_normals){
+  
+
   ROS_INFO("DOT_PCDFeature calculate");
 };
 

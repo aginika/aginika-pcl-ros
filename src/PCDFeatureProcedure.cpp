@@ -126,4 +126,6 @@ void PCDFeatureProcedure::writeOutFeatures(std::string filename){
     copy(f_vector.begin(), f_vector.end(), std::ostream_iterator<float>(output_file , ", "));
     output_file << std::endl;
   }
+
+  target_feature_->clear_features();
 }

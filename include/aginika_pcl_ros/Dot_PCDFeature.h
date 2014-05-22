@@ -29,7 +29,9 @@ public:
     radius_search_ = radius_search;
   };
 
+  void setNormalNums(int normal_nums){normal_nums_ = normal_nums;};
   float radius_search_;
+  int normal_nums_;
 };
 
 #endif

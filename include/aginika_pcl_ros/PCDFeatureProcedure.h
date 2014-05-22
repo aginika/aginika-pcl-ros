@@ -42,6 +42,8 @@ public:
     return features_;
   }
 
+  void clear_features(){features_.clear();};
+
   std::string feature_name_;
   std::vector<std::vector<float> > features_;
 };
