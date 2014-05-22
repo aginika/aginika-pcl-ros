@@ -37,7 +37,7 @@ class RandomForestLearner:
 
         data_x_clothes = self.getDatas(clothes_directory)
         data_y_clothes = [0] * int(len(data_x_clothes))
-        rospy.loginfo("Data non_clothes setup done" + str(len(data_y_non_clothes)))
+        rospy.loginfo("Data clothes setup done" + str(len(data_x_clothes)))
 
         self.data_x_con = data_x_clothes + data_x_non_clothes
         self.data_y_con = data_y_clothes + data_y_non_clothes
