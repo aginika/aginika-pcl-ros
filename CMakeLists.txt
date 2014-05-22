@@ -40,6 +40,7 @@ add_library(aginika_pcl_ros
   src/FPFH_Average_PCDFeature.cpp
   src/AllPassFilter.cpp
   src/RandomRegionFilter.cpp
+  src/Dot_PCDFeature.cpp
 )
 target_link_libraries(aginika_pcl_ros ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES})
 add_dependencies(aginika_pcl_ros ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)

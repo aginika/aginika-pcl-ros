@@ -1,6 +1,7 @@
 #include <aginika_pcl_ros/PCDFeatureProcedure.h>
 #include <aginika_pcl_ros/FPFH_PCDFeature.h>
 #include <aginika_pcl_ros/FPFH_Average_PCDFeature.h>
+#include <aginika_pcl_ros/Dot_PCDFeature.h>
 #include <aginika_pcl_ros/AllPassFilter.h>
 #include <aginika_pcl_ros/RandomRegionFilter.h>
 #include <ros/ros.h>
@@ -23,6 +24,7 @@ int main(int argc, char* argv[]){
     ROS_ERROR("        1:RandomRegion");
     ROS_ERROR("feature 0:FPFH (random chose)");
     ROS_ERROR("        1:FPFH_Average");
+    ROS_ERROR("        2:Dot");
     exit(-1);
   }
 
@@ -64,6 +66,10 @@ int main(int argc, char* argv[]){
   case 1:
     {
       feature = new FPFH_Average_PCDFeature();
+    }
+  case 2:
+    {
+      feature = new DOT_PCDFeature();
     }
     break;
   default:

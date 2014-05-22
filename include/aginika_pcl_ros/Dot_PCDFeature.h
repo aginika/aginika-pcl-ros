@@ -18,6 +18,9 @@
 #include <pcl/sample_consensus/model_types.h>
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
+#include <algorithm>
+#include <functional>
+#include <pcl/octree/octree.h>
 
 class DOT_PCDFeature : public PCDFeature{
 public:
@@ -28,9 +31,13 @@ public:
   void setRadiusSearch(float radius_search){
     radius_search_ = radius_search;
   };
+  void setResolution(float resolution){
+    resolution_ = resolution;
+  };
 
   void setNormalNums(int normal_nums){normal_nums_ = normal_nums;};
   float radius_search_;
+  float resolution_;
   int normal_nums_;
 };
 
