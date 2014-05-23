@@ -4,6 +4,7 @@
 #include <aginika_pcl_ros/Dot_PCDFeature.h>
 #include <aginika_pcl_ros/DIFFDOT_PCDFeature.h>
 #include <aginika_pcl_ros/SHOT_PCDFeature.h>
+#include <aginika_pcl_ros/SHAPE_CONTEXT_PCDFeature.h>
 #include <aginika_pcl_ros/AllPassFilter.h>
 #include <aginika_pcl_ros/RandomRegionFilter.h>
 #include <aginika_pcl_ros/RandomSquareFilter.h>
@@ -31,6 +32,7 @@ int main(int argc, char* argv[]){
     ROS_ERROR("        2:Dot");
     ROS_ERROR("        3:SHOT");
     ROS_ERROR("        4:DIFFDOT");
+    ROS_ERROR("        5:SHAPE_CONTEXT");
     exit(-1);
   }
 
@@ -92,6 +94,11 @@ int main(int argc, char* argv[]){
   case 4:
     {
       feature = new DIFFDOT_PCDFeature();
+    }
+    break;
+  case 5:
+    {
+      feature = new SHAPE_CONTEXT_PCDFeature();
     }
     break;
   default:
