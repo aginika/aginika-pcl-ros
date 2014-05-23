@@ -7,7 +7,7 @@ FPFH_Average_PCDFeature::FPFH_Average_PCDFeature():radius_search_(0.03){
 void FPFH_Average_PCDFeature::calculate(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr input_normals){
 
         pcl::FPFHEstimationOMP<pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal, pcl::FPFHSignature33> fpfh;
-        fpfh.setNumberOfThreads(8);
+        fpfh.setNumberOfThreads(32);
         fpfh.setInputCloud (input_normals);
         fpfh.setInputNormals (input_normals);
         pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGBNormal>);

@@ -45,7 +45,7 @@ class RandomForestLearner:
 
 
     def calculate(self):
-        clf = RandomForestClassifier(n_estimators=250, max_features=7, max_depth=None, min_split=1, random_state=0)
+        clf = RandomForestClassifier(n_estimators=350, max_features=10, max_depth=None, min_split=1, random_state=0)
         scores = cross_val_score(clf, np.array(self.data_x_con), np.array(self.data_y_con))
         print "random foreset : "
         print scores.mean()

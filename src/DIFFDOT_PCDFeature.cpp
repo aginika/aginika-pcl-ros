@@ -12,24 +12,25 @@ DIFFDOT_PCDFeature::DIFFDOT_PCDFeature(){
 void DIFFDOT_PCDFeature::calculate(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr input_normals){
   // Compute normals using both small and large scales at each point
 
+  ROS_INFO("HERE1");
   pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGBNormal>);
 
   pcl::NormalEstimationOMP<pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal> ne;
   ne.setInputCloud (input_normals);
   ne.setSearchMethod (tree);
-
+  ROS_INFO("HERE2");
   // calculate normals with the large scale
   pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr normals_large_scale (new pcl::PointCloud<pcl::PointXYZRGBNormal>);
 
   ne.setRadiusSearch (normals_large_scale_);
   ne.compute (*normals_large_scale);
-
+  ROS_INFO("HERE3");
   // Create DoN operator
   pcl::DifferenceOfNormalsEstimation<pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal> don;
   don.setInputCloud (input_normals);
   don.setNormalScaleLarge (normals_large_scale);
   don.setNormalScaleSmall (input_normals);
-
+  ROS_INFO("HERE4");
   if (!don.initCompute ())
     {
       std::cerr << "Error: Could not intialize DoN feature operator" << std::endl;
@@ -37,8 +38,11 @@ void DIFFDOT_PCDFeature::calculate(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr 
     }
 
   pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr doncloud (new pcl::PointCloud<pcl::PointXYZRGBNormal>);
+  pcl::copyPointCloud<pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal>(*input_normals, *doncloud);
+
   // Compute DoN
   don.computeFeature (*doncloud);
+  ROS_INFO("HERE5");
 
   pcl::octree::OctreePointCloudSearch<pcl::PointXYZRGBNormal> search_octree (resolution_);
   search_octree.setInputCloud (doncloud);
