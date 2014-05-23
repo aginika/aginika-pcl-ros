@@ -48,17 +48,15 @@ void DIFFDOT_PCDFeature::calculate(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr 
   search_octree.setInputCloud (doncloud);
   search_octree.addPointsFromInputCloud ();
 
-  srand(time(NULL));
-
   std::vector< float > dot_array;
   for(int i = 0; i < normal_nums_; i ++){
-    int target_id = rand() % doncloud->points.size() ;
+    int target_id = std::rand() % doncloud->points.size() ;
     std::vector< int > k_indices;
     std::vector< float > k_sqr_distances;
 
     search_octree.nearestKSearch (target_id, 1, k_indices, k_sqr_distances);
     pcl::PointXYZRGBNormal point1 = doncloud->points[target_id];
-    pcl::PointXYZRGBNormal point2 = doncloud->points[target_id];
+    pcl::PointXYZRGBNormal point2 = doncloud->points[k_indices[0]];
     float dot_value = point1.x * point2.x + point1.y * point2.y + point1.z * point2.z;
     dot_array.push_back(dot_value);
   }

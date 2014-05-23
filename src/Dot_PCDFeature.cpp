@@ -12,11 +12,9 @@ void DOT_PCDFeature::calculate(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr inpu
   search_octree.setInputCloud (input_normals);
   search_octree.addPointsFromInputCloud ();
 
-  srand(time(NULL));
-
   std::vector< float > dot_array;
   for(int i = 0; i < normal_nums_; i ++){
-    int target_id = rand() % input_normals->points.size() ;
+    int target_id = std::rand() % input_normals->points.size() ;
     std::vector< int > k_indices;
     std::vector< float > k_sqr_distances;
 

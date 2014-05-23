@@ -5,6 +5,7 @@ PCDFeatureProcedure::PCDFeatureProcedure(){
   normals_for_feature_.reset(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
   pnh_ = new ros::NodeHandle("~");
   pub_ = pnh_->advertise<sensor_msgs::PointCloud2>("debug", 1);
+  srand(time(NULL));
 
   repeat_time_ = 30;
 }
