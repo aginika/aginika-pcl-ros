@@ -22,7 +22,7 @@ void DOT_PCDFeature::calculate(pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr inpu
 
     search_octree.nearestKSearch (target_id, 1, k_indices, k_sqr_distances);
     pcl::PointXYZRGBNormal point1 = input_normals->points[target_id];
-    pcl::PointXYZRGBNormal point2 = input_normals->points[target_id];
+    pcl::PointXYZRGBNormal point2 = input_normals->points[k_indices[0]];
     float dot_value = point1.x * point2.x + point1.y * point2.y + point1.z * point2.z;
     dot_array.push_back(dot_value);
   }
