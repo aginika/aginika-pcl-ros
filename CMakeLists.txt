@@ -44,6 +44,7 @@ add_library(aginika_pcl_ros
   src/RandomSquareFilter.cpp
   src/Dot_PCDFeature.cpp
   src/DIFFDOT_PCDFeature.cpp
+  src/GRAVDOT_PCDFeature.cpp
   src/SHAPE_CONTEXT_PCDFeature.cpp
 )
 target_link_libraries(aginika_pcl_ros ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES})

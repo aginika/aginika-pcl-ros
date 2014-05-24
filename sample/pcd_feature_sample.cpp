@@ -3,6 +3,7 @@
 #include <aginika_pcl_ros/FPFH_Average_PCDFeature.h>
 #include <aginika_pcl_ros/Dot_PCDFeature.h>
 #include <aginika_pcl_ros/DIFFDOT_PCDFeature.h>
+#include <aginika_pcl_ros/GRAVDOT_PCDFeature.h>
 #include <aginika_pcl_ros/SHOT_PCDFeature.h>
 #include <aginika_pcl_ros/SHAPE_CONTEXT_PCDFeature.h>
 #include <aginika_pcl_ros/AllPassFilter.h>
@@ -33,6 +34,7 @@ int main(int argc, char* argv[]){
     ROS_ERROR("        3:SHOT");
     ROS_ERROR("        4:DIFFDOT");
     ROS_ERROR("        5:SHAPE_CONTEXT");
+    ROS_ERROR("        6:GRAVDOT");
     exit(-1);
   }
 
@@ -99,6 +101,11 @@ int main(int argc, char* argv[]){
   case 5:
     {
       feature = new SHAPE_CONTEXT_PCDFeature();
+    }
+    break;
+  case 6:
+    {
+      feature = new GRAVDOT_PCDFeature();
     }
     break;
   default:
