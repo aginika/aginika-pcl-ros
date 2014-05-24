@@ -1,13 +1,23 @@
 <launch>
-  <!-- <arg name="" value=""/> -->
+  <arg name="feature_type" default="random_region_FPFH"/>
+  <arg name="estimators" default="150"/>
+  <arg name="features" default="10"/>
   <!-- <param name="depth_registered" value="true"/> -->
-  <!-- <node pkg="aginika_pcl_ros" name="leaner" type="random_forests.py" args="$(env HOME)/feature_result/random_region_FPFH_Average/non_clothes/ $(env HOME)/feature_result/random_region_FPFH_Average/clothes/" output="screen" clear_params="true"/> -->
 
-  <!-- <node pkg="aginika_pcl_ros" name="leaner" type="random_forests.py" args="$(env HOME)/feature_result2/random_region_FPFH_Average/non_clothes/ $(env HOME)/feature_result2/random_region_FPFH_Average/clothes/" output="screen" clear_params="true"/> -->
+  <!-- <node pkg="aginika_pcl_ros" name="leaner" type="random_forests.py" args="$(env HOME)/feature_result2/random_region_FPFH_Large/non_clothes/ $(env HOME)/feature_result2/random_region_FPFH_Large/clothes/" output="screen" clear_params="true"/> -->
 
   <!-- <node pkg="aginika_pcl_ros" name="leaner" type="random_forests.py" args="$(env HOME)/feature_result2/random_region_DOT/non_clothes/ $(env HOME)/feature_result2/random_region_DOT/clothes/" output="screen" clear_params="true"/> -->
 
-  <node pkg="aginika_pcl_ros" name="leaner" type="random_forests.py" args="$(env HOME)/feature_result2/random_region_SHOT/non_clothes/ $(env HOME)/feature_result2/random_region_SHOT/clothes/" output="screen" clear_params="true"/>
+  <!-- <node pkg="aginika_pcl_ros" name="leaner" type="random_forests.py" args="$(env HOME)/feature_result2/random_region_SHOT/non_clothes/ $(env HOME)/feature_result2/random_region_SHOT/clothes/" output="screen" clear_params="true"/> -->
+
+  <!-- <node pkg="aginika_pcl_ros" name="leaner" type="random_forests.py" args="$(env HOME)/feature_result2/random_square_FPFH_Average/non_clothes/ $(env HOME)/feature_result2/random_square_FPFH_Average/clothes/" output="screen" clear_params="true"/> -->
+
+  <!-- <node pkg="aginika_pcl_ros" name="leaner" type="random_forests.py" args="$(env HOME)/feature_result2/random_region_DOT/non_clothes/ $(env HOME)/feature_result2/random_region_DOT/clothes/" output="screen" clear_params="true"/> -->
+
+  <!-- <node pkg="aginika_pcl_ros" name="leaner" type="random_forests.py" args="$(env HOME)/feature_result2/random_region_DIFFDOT/non_clothes/ $(env HOME)/feature_result2/random_region_DIFFDOT/clothes/" output="screen" clear_params="true"/> -->
+
+  <node pkg="aginika_pcl_ros" name="leaner" type="random_forests.py" args="$(env HOME)/feature_result2/$(arg feature_type)/non_clothes/ $(env HOME)/feature_result2/$(arg feature_type)/clothes/ $(arg feature_type)_$(arg estimators)_$(arg features) $(arg estimators) $(arg features)" output="screen" clear_params="true"/>
+
 
   <!-- <include file="$(find )/.launch"/> -->
 </launch>

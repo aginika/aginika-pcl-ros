@@ -1,6 +1,6 @@
 #include <aginika_pcl_ros/FPFH_PCDFeature.h>
 
-FPFH_PCDFeature::FPFH_PCDFeature():radius_search_(0.03){
+FPFH_PCDFeature::FPFH_PCDFeature():radius_search_(0.1){
   feature_name_ = "FPFH";
 };
 

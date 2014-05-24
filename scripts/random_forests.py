@@ -46,8 +46,6 @@ class RandomForestLearner:
         self.data_y_con = data_y_clothes + data_y_non_clothes
 
     def calculate(self):
-        clf = RandomForestClassifier(n_estimators=self.estimators, max_features=self.features, max_depth=None, min_split=1, random_state=0)
-        scores = cross_val_score(clf, np.array(self.data_x_con), np.array(self.data_y_con))
         import os
         home = os.environ['HOME']
         import time
@@ -57,6 +55,9 @@ class RandomForestLearner:
         f.write("Target Directory is below")
         f.write("    "+self.non_clothes_directory)
         f.write("    "+self.clothes_directory)
+
+        clf = RandomForestClassifier(n_estimators=self.estimators, max_features=self.features, max_depth=None, min_split=1, random_state=0)
+        scores = cross_val_score(clf, np.array(self.data_x_con), np.array(self.data_y_con))
         f.write("random foreset result: "+ str(scores.mean()))
         f.write("Parmas:")
         f.write("    estimators : "+str(self.estimators))
