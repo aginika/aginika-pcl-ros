@@ -12,7 +12,8 @@ clothes_directories=""
 class RandomForestLearner:
     def __init__(self):
         self.file_name_hint = "*.txt"
-
+        self.estimators = 350
+        self.features = 7
 
     def getFiles(self, directory):
         return glob.glob( directory + self.file_name_hint)
@@ -31,6 +32,8 @@ class RandomForestLearner:
         return data_list
 
     def setupBothClass(self, non_clothes_directory, clothes_directory):
+        self.non_clothes_directory = non_clothes_directory
+        self.clothes_directory = clothes_directory
         data_x_non_clothes = self.getDatas(non_clothes_directory)
         data_y_non_clothes = [1] * int(len(data_x_non_clothes))
         rospy.loginfo("Data non_clothes setup done" + str(len(data_x_non_clothes)))
@@ -42,12 +45,23 @@ class RandomForestLearner:
         self.data_x_con = data_x_clothes + data_x_non_clothes
         self.data_y_con = data_y_clothes + data_y_non_clothes
 
-
-
     def calculate(self):
-        clf = RandomForestClassifier(n_estimators=350, max_features=10, max_depth=None, min_split=1, random_state=0)
+        clf = RandomForestClassifier(n_estimators=self.estimators, max_features=self.features, max_depth=None, min_split=1, random_state=0)
         scores = cross_val_score(clf, np.array(self.data_x_con), np.array(self.data_y_con))
-        print "random foreset : "
+        import os
+        home = os.environ['HOME']
+        import time
+        from datetime import datetime
+        target_path = home + "/random_forest_result/" + self.filename + str(int(time.mktime(datetime.now().timetuple())))
+        f = open(target_path)
+        f.write("Target Directory is below")
+        f.write("    "+self.non_clothes_directory)
+        f.write("    "+self.clothes_directory)
+        f.write("random foreset result: "+ str(scores.mean()))
+        f.write("Parmas:")
+        f.write("    estimators : "+str(self.estimators))
+        f.write("    features   : "+str(self.features))
+        f.close()
         print scores.mean()
 
     def save_clf(self):
@@ -56,6 +70,15 @@ class RandomForestLearner:
         from sklearn.externals import joblib
         joblib.dump(clf, "/tmp/")
 
+
+    def set_file_name(self, filename):
+        self.filename = filename
+
+    def set_estimators(self, estimators):
+        self.estimators = estimators
+
+    def set_features(self, features):
+        self.features = features
 
 if __name__ == "__main__":
     import rospy
@@ -66,7 +89,7 @@ if __name__ == "__main__":
     argc = len(argvs)
 
     rospy.loginfo("Random Forest Before")
-    if  argc < 3:
+    if  argc < 6:
         exit()
 
     rospy.init_node('leaner', anonymous=True)
@@ -75,6 +98,9 @@ if __name__ == "__main__":
     classifier = RandomForestLearner()
     rospy.loginfo("Random Forest Setup Both Class")
     classifier.setupBothClass(argvs[1], argvs[2])
+    classifier.set_file_name(argvs[3])
+    classifier.set_estimators(int(argvs[4]))
+    classifier.set_features(int(argvs[5]))
     rospy.loginfo("Random Forest Calculate Start")
     classifier.calculate()
     rospy.loginfo("Random Forest Calculate end")
