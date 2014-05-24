@@ -62,7 +62,7 @@ int main(int argc, char* argv[]){
     break;
   case 2:
     {
-      filter = new RandomRegionFilter();
+      filter = new RandomSquareFilter();
     }
     break;
   default:
