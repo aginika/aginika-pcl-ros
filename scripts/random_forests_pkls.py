@@ -45,13 +45,13 @@ class RandomForestLearner:
 
 
     def calculate(self):
-        clf = RandomForestClassifier(n_estimators=250, max_features=7, max_depth=None, min_split=1, random_state=0)
+        clf = RandomForestClassifier(n_estimators=250, max_features=7, max_depth=None, min_samples_split=1, random_state=0)
         scores = cross_val_score(clf, np.array(self.data_x_con), np.array(self.data_y_con))
         print "random foreset : "
         print scores.mean()
 
     def save_clf(self):
-        clf = RandomForestClassifier(n_estimators=250, max_features=7, max_depth=29, min_split=1, random_state=0)
+        clf = RandomForestClassifier(n_estimators=250, max_features=7, max_depth=29, min_samples_split=1, random_state=0)
         clf.fit(self.data_x_con, self.data_y_con)
         from sklearn.externals import joblib
         joblib.dump(clf, "/tmp/random_forest.pkl")

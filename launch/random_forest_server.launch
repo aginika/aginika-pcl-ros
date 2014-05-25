@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="aginika_pcl_ros" type="random_forest_server.py" name="random_forest_cloth_classifier" output="screen">
+    <rosparam param="random_forest_train_file">/home/inagaki/random_forest_result/random_region_FPFH_Average/random_forest.pkl</rosparam>
+    <!-- <rosparam param="random_forest_train_file">/home/inagaki/catkin_ws/src/mutable_check_random_forest/scripts/normal_dots6.txt</rosparam> -->
+    <!-- <rosparam param="random_forest_train_class_file">/home/inagaki/catkin_ws/src/mutable_check_random_forest/scripts/normal_dots6_class.txt</rosparam> -->
+  </node>
+</launch>
