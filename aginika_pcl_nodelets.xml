@@ -1,4 +1,17 @@
-<library path="lib/libjsk_pcl_ros">
+<library path="lib/libaginika_pcl_ros">
+  <class name="aginika_pcl_ros/ColorizeRandomForest" type="ColorizeRandomForest"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      jsk_pcl_ros::ColorizeRandomForest
+    </description>
+  </class>
+  <class name="aginika_pcl_ros/ColorizeMapRandomForest" type="ColorizeMapRandomForest"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      jsk_pcl_ros::ColorizeMapRandomForest
+    </description>
+  </class>
+
   <class name="aginika_pcl/ConcaveHull" type="ConcaveHull"
          base_class_type="nodelet::Nodelet">
     <description>

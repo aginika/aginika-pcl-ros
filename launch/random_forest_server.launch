@@ -1,7 +1,29 @@
 <launch>
+  <arg name="manager" default="pcl_nodelet_manager" />
+  <arg name="input_point" default="/camera/depth_registered/points"/>
+
+  <include file="$(find openni_launch)/launch/openni.launch">
+    <arg name="depth_registration" value="true"/>
+  </include>
+
   <node pkg="aginika_pcl_ros" type="random_forest_server.py" name="random_forest_cloth_classifier" output="screen">
     <rosparam param="random_forest_train_file">/home/inagaki/random_forest_result/random_region_FPFH_Average/random_forest.pkl</rosparam>
-    <!-- <rosparam param="random_forest_train_file">/home/inagaki/catkin_ws/src/mutable_check_random_forest/scripts/normal_dots6.txt</rosparam> -->
-    <!-- <rosparam param="random_forest_train_class_file">/home/inagaki/catkin_ws/src/mutable_check_random_forest/scripts/normal_dots6_class.txt</rosparam> -->
   </node>
+
+
+  <node pkg="nodelet" type="nodelet" name="$(arg manager)"
+        args="manager" output="screen"/>
+  
+  <node pkg="nodelet" type="nodelet"
+        name="colorize"
+        args="load aginika_pcl_ros/ColorizeRandomForest $(arg manager)"
+        output="screen" clear_params="true">
+    <remap from="~input" to="$(arg input_point)" />
+    <rosparam>
+      rs: 0.03
+      po: 0.03
+    </rosparam>
+  </node>
+
+
 </launch>

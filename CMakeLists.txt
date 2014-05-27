@@ -46,6 +46,8 @@ add_library(aginika_pcl_ros
   src/DIFFDOT_PCDFeature.cpp
   src/GRAVDOT_PCDFeature.cpp
   src/SHAPE_CONTEXT_PCDFeature.cpp
+  src/colorize_random_forest_result_nodelet.cpp
+  src/colorize_random_forest_result2_nodelet.cpp
 )
 target_link_libraries(aginika_pcl_ros ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES})
 add_dependencies(aginika_pcl_ros ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
@@ -75,6 +77,10 @@ add_executable(selected_pointcloud_saver src/selected_pointcloud_saver.cpp)
 target_link_libraries(selected_pointcloud_saver ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES})
 add_dependencies(selected_pointcloud_saver ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
 
+add_executable(colorize_random_forest src/colorize_random_forest_result.cpp)
+target_link_libraries(colorize_random_forest ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES})
+add_dependencies(colorize_random_forest ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
+
 
 add_executable(pcd_feature_sample sample/pcd_feature_sample.cpp)
 target_link_libraries(pcd_feature_sample ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES} aginika_pcl_ros)
@@ -84,7 +90,7 @@ add_dependencies(pcd_feature_sample ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencf
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
-install(TARGETS simple_mutable_model_tracking multi_tracking_upgrade_manager selected_pointcloud_saver generalized_icp_server pcd_feature_sample
+install(TARGETS simple_mutable_model_tracking selected_pointcloud_saver multi_tracking_upgrade_manager colorize_random_forest generalized_icp_server pcd_feature_sample
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
