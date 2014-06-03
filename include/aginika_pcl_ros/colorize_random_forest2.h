@@ -106,6 +106,7 @@ namespace aginika_pcl_ros
     float pass_offset2_;
     int min_inliers_;
     int mode_;
+    int sum_num_;
   private:
     virtual void onInit();
     void extract(const sensor_msgs::PointCloud2 cloud);

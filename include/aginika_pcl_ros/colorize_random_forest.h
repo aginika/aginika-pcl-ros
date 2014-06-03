@@ -94,6 +94,7 @@ namespace aginika_pcl_ros
   protected:
     ros::Subscriber sub_input_;
     ros::Publisher pub_;
+    ros::Publisher pub2_;
 
     double angular_threshold_;
     double mps_distance_threshold_;
@@ -103,8 +104,9 @@ namespace aginika_pcl_ros
     double refinement_threshold_;
     float radius_search_;
     float pass_offset_;
+    float pass_offset2_;
     int min_inliers_;
-    int mode_;
+    int sum_num_;
   private:
     virtual void onInit();
     void extract(const sensor_msgs::PointCloud2 cloud);

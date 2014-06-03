@@ -1,7 +1,7 @@
 <launch>
   <arg name="filter" default="1"/>
-  <arg name="feature" default="1"/>
-  <arg name="cloth" defualt="true"/>
+  <arg name="feature" default="0"/>
+  <arg name="cloth" default="true"/>
   <!-- <node pkg="aginika_pcl_ros" name="pcd_feature_sample" type="pcd_feature_sample" -->
   <!--       args=" 1 1 0 $(env HOME)/pcd/non_clothes/non_clothes_1/ $(env HOME)/pcd/non_clothes/non_clothes_2/ $(env HOME)/pcd/non_clothes/non_clothes_3/ $(env HOME)/pcd/non_clothes/non_clothes_4/" output="screen" clear_params="true"/> -->
 

@@ -1,0 +1,40 @@
+<launch>
+  <include file="$(find openni_launch)/launch/openni.launch">
+    <arg name="depth_registration" value="true"/>
+  </include>
+
+  <node pkg="topic_tools" type="throttle" name="depth_points_reduction" args=" messages /camera/depth_registered/points 3.0"/>
+
+  <arg name="manager" default="pcl_nodelet_manager" />
+  <arg name="input_point" default="/camera/depth_registered/points_throttle"/>
+
+  <group ns="pcl_nodelet">
+    <node pkg="nodelet" type="nodelet" name="$(arg manager)"
+          args="manager" output="screen"/>
+    <node pkg="nodelet" type="nodelet" name="normal_estimate"
+          args="load pcl/NormalEstimationOMP $(arg manager)"
+          clear_params="true">
+      <remap from="~input" to="$(arg input_point)" />
+      <rosparam>
+        radius_search: 0.02
+        k_search: 0
+        # 0, => ANN, 1 => FLANN, 2 => Organized
+        spatial_locator: 2
+      </rosparam>
+    </node>
+    <node pkg="nodelet" type="nodelet" name="normal_concat"
+          args="load jsk_pcl/NormalConcatenater $(arg manager)"
+          clear_params="true">
+      <remap from="~input" to="passthrough_z/output"/>
+      <remap from="~normal" to="normal_estimate/output"/>
+    </node>
+    <!-- <node pkg="nodelet" type="nodelet" name="pcd_writer" -->
+    <!--       args="load pcl/PCDWriter $(arg manager)" -->
+    <!--       clear_params="true"> -->
+    <!--   <remap from="~input" to="normal_concat/output"/> -->
+    <!-- </node> -->
+  </group>
+
+  <node pkg="rosbag" type="record" name="rosbag_record" args=" /tf /pcl_nodelet/normal_concat/output -o $(env HOME)/bagfiles/ "/>
+
+</launch>

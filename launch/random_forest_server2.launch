@@ -37,15 +37,17 @@
         max_queue_size: 5000
       </rosparam>
   </node>
-
+  
   <node pkg="nodelet" type="nodelet"
         name="colorize"
-        args="load aginika_pcl_ros/ColorizeRandomForest $(arg manager)"
+        args="load aginika_pcl_ros/ColorizeMapRandomForest $(arg manager)"
         output="screen" clear_params="true">
     <remap from="~input" to="extract_nonground_indices/output" />
     <rosparam>
-      rs: 0.03
-      po: 0.03
+      rs: 0.02
+      po: 0.02
+      po2: 0.05
+      sum_num: 100
     </rosparam>
   </node>
 

@@ -52,15 +52,11 @@ namespace aginika_pcl_ros
     srand(time(NULL));
 
     double tmp_radius, tmp_pass, tmp_pass2;
+    int tmp_sum_num;
     tmp_radius = 0.03;
     tmp_pass = 0.03;
-    tmp_pass2 = 0.2;
-    if (!pnh_->getParam("mode", mode_))
-      {
-        ROS_WARN("~mode is not specified, set 1");
-        mode_ = 1;
-      }
-
+    tmp_pass2 = 0.06;
+    tmp_sum_num = 100;
     if (!pnh_->getParam("rs", tmp_radius))
       {
         ROS_WARN("~rs is not specified, set 1");
@@ -76,10 +72,15 @@ namespace aginika_pcl_ros
         ROS_WARN("~po is not specified, set 1");
       }
 
+    if (!pnh_->getParam("sum_num", tmp_sum_num))
+      {
+        ROS_WARN("~sum_num is not specified, set 1");
+      }
+
     radius_search_ = tmp_radius;
     pass_offset_ = tmp_pass;
     pass_offset2_ = tmp_pass2;
-
+    sum_num_ = tmp_sum_num;
   }
 
   void ColorizeMapRandomForest::extract(const sensor_msgs::PointCloud2 pc)
@@ -104,7 +105,6 @@ namespace aginika_pcl_ros
     pass.setFilterFieldName (std::string("z"));
     pass.setFilterLimits (0.0, 1.5);
     pass.filter (*cloud);
-    ROS_INFO("pass through");
 
     //Normal Estimation
     // Create the normal estimation class, and pass the input dataset to it
@@ -134,19 +134,22 @@ namespace aginika_pcl_ros
 
     int result_counter=0;
     int call_counter = 0;
+    clock_t start=clock(),now;
+    pcl::PointXYZRGBNormal max_pt,min_pt;
+    pcl::getMinMax3D(*cloud_normals, min_pt, max_pt);
+
+    now = clock();
+    ROS_INFO("min max %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
 
 
     for (int i = 0 ; i < 100; i++){
       ROS_INFO_COND(i%10 == 0,"Calculate time %d / 10", i);
-      pcl::PointXYZRGBNormal max_pt,min_pt;
-      pcl::getMinMax3D(*cloud_normals, min_pt, max_pt);
+      start = clock();
       ROS_INFO("fpfh %d / 100", i);
-      double lucky = 0;
-      double lucky2 = 0;
-      std::string axis("x");
-      std::string other_axis("y");
-      int rand_xyz = rand()%2;//%3;
-      if (rand_xyz == 0){
+      double lucky = 0, lucky2 = 0;
+      std::string axis("x"),other_axis("y");
+      int rand_xy = rand()%2;
+      if (rand_xy == 0){
         lucky = min_pt.x - pass_offset_ + (max_pt.x - min_pt.x - pass_offset_*2) * 1.0 * rand() / RAND_MAX;
         lucky2 = min_pt.y + (max_pt.y - min_pt.y) * 1.0 * rand() / RAND_MAX;
       }
@@ -167,8 +170,6 @@ namespace aginika_pcl_ros
       float large = std::max(lucky, lucky + pass_offset_);
       pass.setFilterLimits (small, large);
       pass.filter (*cloud_normals_pass);
-      
-      // ROS_INFO("num %ld", cloud_normals_pass->points.size());
       pass.setInputCloud (cloud_normals_pass);
       // pass.setIndices (indices_x);
       pass.setFilterFieldName (other_axis);
@@ -177,17 +178,17 @@ namespace aginika_pcl_ros
       pass.setFilterLimits (small2, large2);
       pass.filter (*cloud_normals_pass);
 
-      ROS_INFO("min_x %f max_x %f  small %f large %f  min_y %f max_y %f small2 %f large2%f axis %s other %s", min_pt.x, max_pt.x, small, large ,  min_pt.y, max_pt.y, small2, large2, axis.c_str(), other_axis.c_str());
-
       std::vector<int> tmp_indices;
       pcl::removeNaNFromPointCloud(*cloud_normals_pass, *cloud_normals_pass, tmp_indices);
 
+      now = clock();
+      ROS_INFO("fill pass x y %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
+      start = clock();
 
       if(cloud_normals_pass->points.size() == 0){
         continue;
       }
-      
-      ROS_INFO("fpfh start");
+
       pcl::FPFHEstimationOMP<pcl::PointXYZRGBNormal, pcl::PointXYZRGBNormal, pcl::FPFHSignature33> fpfh;
       fpfh.setNumberOfThreads(8);
       fpfh.setInputCloud (cloud_normals_pass);
@@ -198,12 +199,14 @@ namespace aginika_pcl_ros
       pcl::PointCloud<pcl::FPFHSignature33>::Ptr fpfhs (new pcl::PointCloud<pcl::FPFHSignature33> ());
       fpfh.setRadiusSearch (radius_search_);
       fpfh.compute (*fpfhs);
-      
+      if (fpfhs->points.size() < sum_num_)
+        continue;
+      int target_id = rand() % (fpfhs->points.size() - sum_num_);
       std::vector<float> result;
       bool success = true;
       for(int index = 0; index < 33; index++){
         float sum_hist_points = 0;
-        for(int kndex = 0; kndex < fpfhs->points.size();kndex++)
+        for(int kndex = target_id; kndex < target_id + sum_num_;kndex++)
           {
             if(pcl_isnan(fpfhs->points[kndex].histogram[index])){
               success = false;
@@ -211,11 +214,13 @@ namespace aginika_pcl_ros
               sum_hist_points+=fpfhs->points[kndex].histogram[index];
             }
           }
-        result.push_back( sum_hist_points/fpfhs->points.size() );
+        result.push_back( sum_hist_points/sum_num_ );
       }
 
+      now = clock();
+      ROS_INFO("fpfh calucateion %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
+      start = clock();
 
-      ROS_INFO("fpfh end");
       bool cloth = false;
       if(success){
         call_counter++;
@@ -232,33 +237,44 @@ namespace aginika_pcl_ros
       }else{
         continue;
       }
-      
-      
+
+      now = clock();
+      ROS_INFO("service call end %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
+      start = clock();
+
       Eigen::Vector4f c;
       pcl::compute3DCentroid (*cloud_normals_pass, c);
-      
-      pcl::octree::OctreePointCloudSearch<pcl::PointXYZRGBNormal> search_octree (0.02);
+
+      pcl::octree::OctreePointCloudSearch<pcl::PointXYZRGBNormal> search_octree (0.05);
       search_octree.setInputCloud (cloud_normals);
       search_octree.addPointsFromInputCloud ();
-      
+
       pcl::PointXYZRGBNormal point_a;
       point_a.x = c[0];point_a.y = c[1];point_a.z = c[2];
       std::vector<int> k_indices;
       std::vector<float> k_sqr_distances;
-      search_octree.radiusSearch(point_a, 0.1, k_indices, k_sqr_distances);
-      
+      search_octree.radiusSearch(point_a, 0.05, k_indices, k_sqr_distances);
+
+      now = clock();
+      ROS_INFO("search octree end %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
+      start = clock();
+
       for(int index = 0; index < k_indices.size(); index++){
         int id = k_indices[index];
         if(cloth){
-          cloud_normals->points[id].r = std::min(std::max(255.0 - k_sqr_distances[index] * 200, 0.0) + cloud_normals->points[id].r, 255.0);
+          cloud_normals->points[id].r = std::min(std::max(255.0 - sqrt(k_sqr_distances[index]) * 2000, 0.0) + cloud_normals->points[id].r, 255.0);
           cloud_normals->points[id].g = 0;
-          ROS_INFO("Set color r %d", cloud_normals->points[id].r);
         }else{
 
-          cloud_normals->points[id].b = std::min(std::max(255.0 - k_sqr_distances[index] * 200, 0.0) + cloud_normals->points[id].b, 255.0);
+          cloud_normals->points[id].b = std::min(std::max(255.0 - sqrt(k_sqr_distances[index]) * 2000, 0.0) + cloud_normals->points[id].b, 255.0);
           cloud_normals->points[id].g = 0;
         }
       }
+
+      now = clock();
+      ROS_INFO("color paint%f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
+      start = clock();
+
       
     }
     sensor_msgs::PointCloud2 _pointcloud2;
