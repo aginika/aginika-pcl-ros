@@ -44,10 +44,10 @@
         output="screen" clear_params="true">
     <remap from="~input" to="extract_nonground_indices/output" />
     <rosparam>
-      rs: 0.02
+      rs: 0.03
       po: 0.02
-      po2: 0.05
-      sum_num: 100
+      po2: 0.2
+      sum_num: 500
     </rosparam>
   </node>
 

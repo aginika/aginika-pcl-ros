@@ -85,8 +85,6 @@ namespace aginika_pcl_ros
     cloud->is_dense = false;
     pcl::removeNaNFromPointCloud(*cloud, *cloud, indices);
 
-    clock_t start=clock(),now;
-
     pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
     tree->setInputCloud (cloud);
     pcl::PassThrough<pcl::PointXYZRGB> pass;
@@ -94,9 +92,6 @@ namespace aginika_pcl_ros
     pass.setFilterFieldName (std::string("z"));
     pass.setFilterLimits (0.0, 1.5);
     pass.filter (*cloud);
-    now = clock();
-    ROS_INFO("first pass  %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
-    start = clock();
 
     std::vector<pcl::PointIndices> cluster_indices;
     pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
@@ -106,10 +101,6 @@ namespace aginika_pcl_ros
     ec.setSearchMethod (tree);
     ec.setInputCloud (cloud);
     ec.extract (cluster_indices);
-
-    now = clock();
-    ROS_INFO("euclidean  %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
-    start = clock();
 
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloth_cloud_cluster (new pcl::PointCloud<pcl::PointXYZRGB>);
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr noncloth_cloud_cluster (new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -122,9 +113,6 @@ namespace aginika_pcl_ros
           cloud_cluster->points.push_back (cloud->points[*pit]);
         cloud_cluster->is_dense = true;
         cluster_num ++ ;
-        now = clock();
-        ROS_INFO("cloud_cluaster push back  %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
-        start = clock();
 
         pcl::NormalEstimation<pcl::PointXYZRGB, pcl::PointXYZRGBNormal> ne;
         pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB> ());
@@ -134,29 +122,15 @@ namespace aginika_pcl_ros
         ne.setRadiusSearch (0.02);
         ne.compute (*cloud_normals);
 
-        now = clock();
-        ROS_INFO("normal estimate  %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
-        start = clock();
-
-
         for (int cloud_index = 0; cloud_index <  cloud_normals->points.size(); cloud_index++){
           cloud_normals->points[cloud_index].x = cloud_cluster->points[cloud_index].x;
           cloud_normals->points[cloud_index].y = cloud_cluster->points[cloud_index].y;
           cloud_normals->points[cloud_index].z = cloud_cluster->points[cloud_index].z;
         }
 
-    now = clock();
-    ROS_INFO("concatenate  %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
-    start = clock();
-
-
         int result_counter=0, call_counter = 0;
         pcl::PointXYZRGBNormal max_pt,min_pt;
         pcl::getMinMax3D(*cloud_normals, min_pt, max_pt);
-
-        now = clock();
-        ROS_INFO("get min max 3d  %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
-        start = clock();
 
         for (int i = 0 ; i < 30; i++){
           double lucky = 0, lucky2 = 0;
@@ -187,10 +161,6 @@ namespace aginika_pcl_ros
           pass.setFilterLimits (small2, large2);
           pass.filter (*cloud_normals_pass);
 
-    now = clock();
-    start = clock();
-
-
           std::vector<int> tmp_indices;
           pcl::removeNaNFromPointCloud(*cloud_normals_pass, *cloud_normals_pass, tmp_indices);
 
@@ -207,21 +177,23 @@ namespace aginika_pcl_ros
           fpfh.setRadiusSearch (radius_search_);
           fpfh.compute (*fpfhs);
 
-    now = clock();
-    ROS_INFO("fpfh  %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
-    start = clock();
-
-
-          std::vector<float> result;
-          bool success = true;
-          if ( (int)fpfhs->points.size() - sum_num_ - 1 <= 1 )
+          if((int)fpfhs->points.size() == 0)
             continue;
 
-          int target_id = rand() % ((int)fpfhs->points.size() - sum_num_ - 1);
+          std::vector<float> result;
+          int target_id, max_value;
+          if ((int)fpfhs->points.size() - sum_num_ - 1 < 1){
+            target_id = 0;
+            max_value = (int)fpfhs->points.size();
+          }else{
+            target_id = rand() % ((int)fpfhs->points.size() - sum_num_ - 1);
+            max_value = target_id + sum_num_;
+          }
+
           bool has_nan = false;
           for(int index = 0; index < 33; index++){
             float sum_hist_points = 0;
-            for(int kndex = target_id; kndex < target_id + sum_num_;kndex++)
+            for(int kndex = target_id; kndex < max_value;kndex++)
               {
                 sum_hist_points+=fpfhs->points[kndex].histogram[index];
               }
@@ -235,24 +207,21 @@ namespace aginika_pcl_ros
           if(has_nan)
             break;
 
-    now = clock();
-    ROS_INFO("fpfh average  %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
-    start = clock();
-
-          if(success){
-            call_counter++;
-            ros::ServiceClient client = pnh_->serviceClient<aginika_pcl_ros::PredictData>("/predict");
-            aginika_pcl_ros::PredictData srv;
-            srv.request.data = result;
-            if(client.call(srv))
-              if (srv.response.index == 0)
-                result_counter += 1;
-          }
+          call_counter++;
+          ros::ServiceClient client = pnh_->serviceClient<aginika_pcl_ros::PredictData>("/predict");
+          aginika_pcl_ros::PredictData srv;
+          srv.request.data = result;
+          if(client.call(srv))
+            if (srv.response.index == 0)
+              result_counter += 1;
         }
 
-    now = clock();
-    ROS_INFO("call  %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
-    start = clock();
+        if(result_counter >= call_counter / 2){
+          ROS_INFO("Cloth %d / %d", result_counter, call_counter);
+        }
+        else{
+          ROS_INFO("Not Cloth %d / %d", result_counter, call_counter);
+        }
 
         for (int i = 0; i < cloud_cluster->points.size(); i++){
           if(result_counter >= call_counter / 2){
@@ -262,11 +231,6 @@ namespace aginika_pcl_ros
             noncloth_cloud_cluster->points.push_back (cloud_cluster->points[i]);
           }
         }
-    now = clock();
-    ROS_INFO("last push back  %f [s]" , 1.0 * ( now - start)/CLOCKS_PER_SEC);
-    start = clock();
-
-
       }
     sensor_msgs::PointCloud2 cloth_pointcloud2;
     pcl::toROSMsg(*cloth_cloud_cluster, cloth_pointcloud2);
