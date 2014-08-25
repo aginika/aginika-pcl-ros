@@ -35,7 +35,7 @@
     </rosparam>
   </node>
 
-  <node pkg="aginika_ros_debug_tools" name="topic_pulse_drive" type="topic_pulse_drive" args="/cluster_decomposer/output00" />
+  <!-- <node pkg="aginika_ros_debug_tools" name="topic_pulse_drive" type="topic_pulse_drive" args="/cluster_decomposer/output00" /> -->
 
 
   <node pkg="aginika_pcl_ros" name="pointcloud_saver" type="selected_pointcloud_saver">

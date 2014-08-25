@@ -7,7 +7,7 @@
 
   <node pkg="rosbag" name="rosbag_play" type="play" args=" $(arg rosbag_option) $(arg bagfile_names)" output="screen" clear_params="true"/>
 
-  <node pkg="aginika_ros_debug_tools" name="topic_pulse_drive" type="topic_pulse_drive" args="/pcl_nodelet/normal_concat/output" />
+  <!-- <node pkg="aginika_ros_debug_tools" name="topic_pulse_drive" type="topic_pulse_drive" args="/pcl_nodelet/normal_concat/output" /> -->
 
   <!-- <node pkg="nodelet" type="nodelet" name="$(arg manager)" -->
   <!--       args="manager" output="screen"/> -->

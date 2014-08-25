@@ -43,7 +43,6 @@
 #include <time.h>
 #include <pcl_ros/transforms.h>
 
-#include <aginika_ros_debug_tools/aginika_ros_debug_tools.h>
 using namespace std;
 
 class TrackingObjectInfo{
@@ -1303,7 +1302,7 @@ public:
       tmp_center.x = centroid[0];
       tmp_center.y = centroid[1];
       tmp_center.z = centroid[2];
-      PUBLISH_DEBUG_TF_XYZ(br_, toii.second->getObjectId(), pcl::PointXYZ, tmp_center, toii.second->getFrameId());
+      // PUBLISH_DEBUG_TF_XYZ(br_, toii.second->getObjectId(), pcl::PointXYZ, tmp_center, toii.second->getFrameId());
     }
 
     pub_.publish(tia);

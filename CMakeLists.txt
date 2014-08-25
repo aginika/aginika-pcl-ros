@@ -14,7 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
   genmsg
   sensor_msgs
   tf
-  aginika_ros_debug_tools
 )
 
 add_message_files(FILES IndicesArray.msg PointsArray.msg ClusterPointIndices.msg Int32Stamped.msg TrackerInfo.msg TrackerInfoArray.msg PointCloud2WithId.msg)
@@ -23,7 +22,7 @@ generate_messages(DEPENDENCIES pcl_msgs sensor_msgs)
 
 catkin_package(
   DEPENDS pcl
-  CATKIN-DEPENDS pcl_ros message_runtime pcl_msgs jsk_rviz_plugins aginika_ros_debug_tools sensor_msgs
+  CATKIN-DEPENDS pcl_ros message_runtime pcl_msgs jsk_rviz_plugins sensor_msgs
   INCLUDE_DIRS include
   LIBRARIES aginika_pcl_ros
 )
