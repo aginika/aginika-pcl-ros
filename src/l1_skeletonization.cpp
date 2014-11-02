@@ -227,6 +227,8 @@ namespace aginika_pcl_ros
     CloudPtr cloud(new Cloud());
     convertToPCL(cloud, x_samples_);
     sensor_msgs::PointCloud2 pcl_msgs;
+    pcl_msgs.header.frame_id = frame_id_;
+    pcl_msgs.header.stamp = ros::Time::now();
     pcl::toROSMsg(*cloud ,pcl_msgs);
     pub_.publish(pcl_msgs);
   };
@@ -239,6 +241,7 @@ namespace aginika_pcl_ros
     //convert to Eigen
     convertToEigen();
 
+    publishProcess();
     //iterative process
     while(true)
       {
@@ -259,6 +262,7 @@ namespace aginika_pcl_ros
   void L1Skeletonization::inputCloud(sensor_msgs::PointCloud2 msgs)
   {
     CloudPtr new_cloud(new Cloud);
+    frame_id_ = msgs.header.frame_id;
     pcl::fromROSMsg(msgs, *new_cloud);
     setPointCloud(new_cloud);
     run();

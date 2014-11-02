@@ -114,6 +114,7 @@ namespace aginika_pcl_ros
     ros::NodeHandle nh_;
     ros::Publisher pub_;
     ros::Subscriber sub_;
+    std::string frame_id_;
     std::vector<Eigen::EigenSolver<Eigen::Matrix3f> > covariance_matrixes_;
   };
 }
