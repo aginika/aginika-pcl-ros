@@ -24,4 +24,11 @@
       call service for update tracking model.
     </description>
   </class>
+  <class name="aginika_pcl/PointcloudModelManager" type="aginika_pcl_ros::PointcloudModelManager"
+         base_class_type="nodelet::Nodelet">
+    <description>
+      publish the affordance of the pointcloud to /tf
+    </description>
+  </class>
+
 </library>
