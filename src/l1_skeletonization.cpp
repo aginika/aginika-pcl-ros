@@ -42,7 +42,8 @@ namespace aginika_pcl_ros
 {
   L1Skeletonization::L1Skeletonization():h_(0.5), myu_(0.35)
   {
-    
+    pub_ = nh_.advertise<sensor_msgs::PointCloud2>("skeleton_result", 1);
+    sub_ = nh_.subscribe("target_cloud", 1, &L1Skeletonization::inputCloud, this);
   };
 
   void L1Skeletonization::randomSampling(int sample_rate)
@@ -190,7 +191,7 @@ namespace aginika_pcl_ros
 
   void L1Skeletonization::setPointCloud(CloudPtr& cloud)
   {
-    cloud_ = cloud;
+    pcl::copyPointCloud(*cloud, *cloud_);
   };
 
   void L1Skeletonization::convertToEigen()
@@ -210,6 +211,26 @@ namespace aginika_pcl_ros
     };
   };
 
+  void L1Skeletonization::convertToPCL(CloudPtr& cloud, std::vector<Eigen::Vector3f> x_samples)
+  {
+    for(size_t i = 0; i < x_samples.size(); i++){
+      PointType point;
+      point.x = x_samples[i][0];
+      point.y = x_samples[i][1];
+      point.z = x_samples[i][2];
+      cloud->push_back(point);
+    }
+  };
+
+  void L1Skeletonization::publishProcess()
+  {
+    CloudPtr cloud(new Cloud());
+    convertToPCL(cloud, x_samples_);
+    sensor_msgs::PointCloud2 pcl_msgs;
+    pcl::toROSMsg(*cloud ,pcl_msgs);
+    pub_.publish(pcl_msgs);
+  };
+
   void L1Skeletonization::run()
   {
     //Random sampling
@@ -223,6 +244,7 @@ namespace aginika_pcl_ros
       {
         calculateCovarianceAndEigens();
         updateSamples();
+        publishProcess();
       };
 
     //downsampling
@@ -233,4 +255,20 @@ namespace aginika_pcl_ros
 
     //final curve skeleton
   };
+
+  void L1Skeletonization::inputCloud(sensor_msgs::PointCloud2 msgs)
+  {
+    CloudPtr new_cloud(new Cloud);
+    pcl::fromROSMsg(msgs, *new_cloud);
+    setPointCloud(new_cloud);
+    run();
+  };
 }
+
+
+int main(int argc, char* argv[]){
+  ros::init(argc, argv, "skeletonization");
+  ros::NodeHandle nh;
+  aginika_pcl_ros::L1Skeletonization l1;
+  ros::spin();
+};

@@ -77,6 +77,7 @@ namespace aginika_pcl_ros
 {
   class L1Skeletonization
   {
+  public:
     typedef pcl::PointXYZ PointType;
     typedef typename pcl::PointCloud<PointType> Cloud;
     typedef typename Cloud::Ptr CloudPtr;
@@ -88,8 +89,11 @@ namespace aginika_pcl_ros
     void randomSampling(int sample_rate);
     void setPointCloud(CloudPtr& cloud);
     void convertToEigen();
+    void convertToPCL(CloudPtr& cloud, std::vector<Eigen::Vector3f> x_samples);
     void updateSamples();
+    void publishProcess();
     void run();
+    void inputCloud(sensor_msgs::PointCloud2 msgs);
 
     float theta(float r);
     float sigma(Eigen::EigenSolver<Eigen::Matrix3f> eig);
@@ -107,6 +111,9 @@ namespace aginika_pcl_ros
     std::vector<Eigen::Vector3f> x_samples_;
     float h_;
     float myu_;
+    ros::NodeHandle nh_;
+    ros::Publisher pub_;
+    ros::Subscriber sub_;
     std::vector<Eigen::EigenSolver<Eigen::Matrix3f> > covariance_matrixes_;
   };
 }

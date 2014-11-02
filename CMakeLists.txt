@@ -48,7 +48,6 @@ add_library(aginika_pcl_ros
   src/colorize_random_forest_result_nodelet.cpp
   src/colorize_random_forest_result2_nodelet.cpp
   src/pointcloud_model_manager_nodelet.cpp
-  src/l1_skeletonization.cpp
 )
 target_link_libraries(aginika_pcl_ros ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES})
 add_dependencies(aginika_pcl_ros ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
@@ -86,6 +85,11 @@ add_dependencies(colorize_random_forest ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_g
 add_executable(pcd_feature_sample sample/pcd_feature_sample.cpp)
 target_link_libraries(pcd_feature_sample ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES} aginika_pcl_ros)
 add_dependencies(pcd_feature_sample ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
+
+add_executable(l1_skeletonization src/l1_skeletonization.cpp)
+target_link_libraries(l1_skeletonization ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES} aginika_pcl_ros)
+add_dependencies(l1_skeletonization ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
+
 
 # add_executable(pointcloud_model_manager src/pointcloud_model_manager_nodelet.cpp)
 # target_link_libraries(pointcloud_model_manager ${catkin_LIBRARIES} ${pcl_ros_LIBRARIES} aginika_pcl_ros)
