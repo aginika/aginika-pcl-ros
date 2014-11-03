@@ -40,14 +40,19 @@
 
 namespace aginika_pcl_ros
 {
-  L1Skeletonization::L1Skeletonization():h_(0.5), myu_(0.35)
+  L1Skeletonization::L1Skeletonization():h_(0.5),h_step_(0.5),myu_(0.35)
   {
+    ros::NodeHandle pnh_("~");
+    pnh_.getParam("effective_radius", h_);
+    pnh_.getParam("effective_radius_step", h_step_);
+    pnh_.getParam("myu", myu_);
     pub_ = nh_.advertise<sensor_msgs::PointCloud2>("skeleton_result", 1);
     sub_ = nh_.subscribe("target_cloud", 1, &L1Skeletonization::inputCloud, this);
   };
 
-  void L1Skeletonization::randomSampling(int sample_rate)
+  void L1Skeletonization::randomSampling(float sample_rate)
   {
+    ROS_INFO("RandomSampling start");
     if (sample_rate > 1.0 || sample_rate < 0.0)
       {
         ROS_ERROR("Sample Rate is over 1.0 or under 0.0 !!");
@@ -66,7 +71,9 @@ namespace aginika_pcl_ros
         candidate_cloud->erase(candidate_cloud->begin()+random_index);
         sample_cloud_->push_back(point);
       };
+      ROS_INFO("Sample Num !!!! %d", sample_num);
     }
+    ROS_INFO("RandomSampling done");
   };
 
   float L1Skeletonization::theta(float r)
@@ -115,13 +122,17 @@ namespace aginika_pcl_ros
   std::vector<std::vector<float> > L1Skeletonization::calculate_alphas()
   {
     std::vector<std::vector<float> > alphas;
-    alphas.resize(origin_samples_.size() * x_samples_.size()); //Is this ok?
+    alphas.resize(x_samples_.size());
     for(size_t i = 0; i < x_samples_.size() ; i++)
       {
+        alphas[i].resize(origin_samples_.size());
         for(size_t j = 0; j < origin_samples_.size(); j++)
           {
             float diff_norm = (x_samples_[i] - origin_samples_[j]).norm();
-            alphas[i][j] = theta(diff_norm)/diff_norm;
+            if(diff_norm > 0.00001)
+              alphas[i][j] = theta(diff_norm)/diff_norm;
+            else
+              alphas[i][j] = 0;
           };
       };
     return alphas;
@@ -130,9 +141,10 @@ namespace aginika_pcl_ros
   std::vector<std::vector<float> > L1Skeletonization::calculate_betas()
   {
     std::vector<std::vector<float> > betas;
-    betas.resize(x_samples_.size() * x_samples_.size()); //Is this ok?
+    betas.resize(x_samples_.size());
     for(size_t i = 0; i < x_samples_.size() ; i++)
       {
+        betas[i].resize(x_samples_.size());
         for(size_t j = 0; j < x_samples_.size(); j++)
           {
             if(i == j){
@@ -174,34 +186,35 @@ namespace aginika_pcl_ros
   void L1Skeletonization::updateSamples()
   {
     std::vector<Eigen::Vector3f> new_x_samples;
-    ROS_INFO("Calcurate prepare");
     std::vector<std::vector<float> > alphas = calculate_alphas();
     std::vector<std::vector<float> > betas = calculate_betas();
-   ROS_INFO("Calcurate prepare End");
-
-   ROS_INFO("update start");
-   for(int i = 0; i < x_samples_.size(); i++)
-     {
-       Eigen::Vector3f new_x_sample = first_term(alphas[i]) + second_term(x_samples_[i], betas[i], sigma(covariance_matrixes_[i]));
-       new_x_samples.push_back(new_x_sample);
-     }
-   x_samples_ = new_x_samples;
-   ROS_INFO("Update End");
+    for(int i = 0; i < x_samples_.size(); i++)
+      {
+        Eigen::Vector3f first = first_term(alphas[i]);
+        Eigen::Vector3f second = second_term(x_samples_[i], betas[i], sigma(covariance_matrixes_[i]));
+        Eigen::Vector3f new_x_sample = first + second;
+        new_x_samples.push_back(new_x_sample);
+      }
+    x_samples_ = new_x_samples;
+    ROS_INFO("Update End");
   };
 
   void L1Skeletonization::setPointCloud(CloudPtr& cloud)
   {
+    cloud_.reset(new Cloud());
     pcl::copyPointCloud(*cloud, *cloud_);
   };
 
   void L1Skeletonization::convertToEigen()
   {
+    ROS_INFO("convert to eigen start");
     for(size_t i = 0 ; i < cloud_->size(); i++){
       Eigen::Vector3f origin_sample(cloud_->points[i].x,
                                     cloud_->points[i].y,
                                     cloud_->points[i].z);
       origin_samples_.push_back(origin_sample);
     };
+    ROS_INFO("origin_samples %d", origin_samples_.size());
 
     for(size_t i = 0 ; i < sample_cloud_->size(); i++){
       Eigen::Vector3f x_sample(sample_cloud_->points[i].x,
@@ -209,6 +222,8 @@ namespace aginika_pcl_ros
                                sample_cloud_->points[i].z);
       x_samples_.push_back(x_sample);
     };
+    ROS_INFO("x_samples %d", x_samples_.size());
+    ROS_INFO("convert to eigen end");
   };
 
   void L1Skeletonization::convertToPCL(CloudPtr& cloud, std::vector<Eigen::Vector3f> x_samples)
@@ -227,27 +242,30 @@ namespace aginika_pcl_ros
     CloudPtr cloud(new Cloud());
     convertToPCL(cloud, x_samples_);
     sensor_msgs::PointCloud2 pcl_msgs;
-    pcl_msgs.header.frame_id = frame_id_;
     pcl_msgs.header.stamp = ros::Time::now();
     pcl::toROSMsg(*cloud ,pcl_msgs);
+    pcl_msgs.header.frame_id = frame_id_;
     pub_.publish(pcl_msgs);
   };
 
   void L1Skeletonization::run()
   {
-    //Random sampling
+    //Init data
     randomSampling(0.1);
-
-    //convert to Eigen
     convertToEigen();
-
     publishProcess();
+
     //iterative process
-    while(true)
+    int counter = 0;
+    while(ros::ok())
       {
+        ROS_INFO("while loop: %d (h_: %lf) (h_step_: %lf) (myu_: %lf)", counter, h_, h_step_, myu_);
         calculateCovarianceAndEigens();
         updateSamples();
         publishProcess();
+
+        h_ += h_step_;
+        counter++;
       };
 
     //downsampling
@@ -264,6 +282,9 @@ namespace aginika_pcl_ros
     CloudPtr new_cloud(new Cloud);
     frame_id_ = msgs.header.frame_id;
     pcl::fromROSMsg(msgs, *new_cloud);
+    std::vector<int> indices;
+    pcl::removeNaNFromPointCloud(*new_cloud, *new_cloud, indices);
+    ROS_INFO("fromROSMsg end : point num %d", new_cloud->size());
     setPointCloud(new_cloud);
     run();
   };

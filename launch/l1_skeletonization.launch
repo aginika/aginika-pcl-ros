@@ -1,9 +1,28 @@
 <launch>
   <!-- <arg name="" value=""/> -->
   <!-- <param name="depth_registered" value="true"/> -->
-  <node pkg="aginika_pcl_ros" name="l1_skeletonization" type="l1_skeletonization" args="" output="screen" clear_params="true"/>
+  <node pkg="aginika_pcl_ros" name="l1_skeletonization" type="l1_skeletonization" args="" output="screen" clear_params="true">
+    <!-- for hand -->
+    <param name="effective_radius" value="0.02"/>
+    <param name="effective_radius_step" value="0.02"/>
+
+    <!-- for pr2 -->
+    <!-- <param name="effective_radius" value="0.1"/> -->
+    <!-- <param name="effective_radius_step" value="0.1"/> -->
+
+    <!-- for pr2 good but shrink-->
+    <!-- <param name="effective_radius" value="0.2"/> -->
+    <!-- <param name="effective_radius_step" value="0.2"/> -->
+
+    <!-- for pr2 good-->
+    <!-- <param name="effective_radius" value="0.15"/> -->
+    <!-- <param name="effective_radius_step" value="0.1"/> -->
+
+  </node>
 
   <node pkg="topic_tools" type="relay" name="cloud_relay" args=" /selected_pointcloud /target_cloud" output="screen" clear_params="true"/>
 
   <node pkg="rviz" name="rviz" type="rviz" args="" output="screen" clear_params="true"/>
+
+  <include file="$(find openni_launch)/launch/openni.launch"/>
 </launch>

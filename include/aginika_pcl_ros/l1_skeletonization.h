@@ -86,7 +86,7 @@ namespace aginika_pcl_ros
     L1Skeletonization();
     ~L1Skeletonization(){};
 
-    void randomSampling(int sample_rate);
+    void randomSampling(float sample_rate);
     void setPointCloud(CloudPtr& cloud);
     void convertToEigen();
     void convertToPCL(CloudPtr& cloud, std::vector<Eigen::Vector3f> x_samples);
@@ -109,8 +109,9 @@ namespace aginika_pcl_ros
     CloudPtr sample_cloud_;
     std::vector<Eigen::Vector3f> origin_samples_;
     std::vector<Eigen::Vector3f> x_samples_;
-    float h_;
-    float myu_;
+    double h_;
+    double h_step_;
+    double myu_;
     ros::NodeHandle nh_;
     ros::Publisher pub_;
     ros::Subscriber sub_;
